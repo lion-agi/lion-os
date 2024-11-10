@@ -1,0 +1,1 @@
+PROMPT = """Simulate a process or system to analyze its behavior under different conditions. Provide a model of the process or system and a set of conditions to run the simulations. Log the results and visualize the simulation outcomes."""

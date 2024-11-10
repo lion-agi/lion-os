@@ -1,0 +1,1 @@
+PROMPT = """Evaluate the output of the given function to determine its quality or correctness. Compare the actual output with the expected output and log the evaluation result along with any discrepancies."""
