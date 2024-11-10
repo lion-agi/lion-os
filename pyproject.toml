@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "lion-os"
+version = "0.0.1"
+description = ""
+authors = ["HaiyangLi <quantocean.li@gmail.com>"]
+readme = "README.md"
+packages = [
+    { include = "lion" },  # This ensures your package is still imported as 'lion'
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+litellm = "^1.52.3"
+pandas = "^2.2.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+pytest-asyncio = "^0.24.0"
+pre-commit = "^4.0.1"
+black = "^24.10.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
