@@ -92,4 +92,4 @@ python 3.11+ required
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/lion-os&type=Date)](https://star-history.com/#yourusername/lion-os)
+[![Star History Chart](https://api.star-history.com/svg?repos=ohdearquant/lion-os&type=Date)](https://star-history.com/#ohdearquant/lion-os)
