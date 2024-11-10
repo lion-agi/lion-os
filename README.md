@@ -1,60 +1,48 @@
-# lion
+# 🦁 Lion Framework
 
-## install
+> A powerful Python framework for structured AI conversations and operations
+
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI version](https://badge.fury.io/py/lion-os.svg)](https://badge.fury.io/py/lion-os)
+
+## 🌟 Features
+
+- 🎯 Dynamic structured output at runtime
+- 🔄 Easy composition of multi-step processes
+- 🤖 Support for any model via `litellm`
+- 🏗️ Built-in conversation management
+- 🧩 Extensible architecture
+- 🔍 Type-safe with Pydantic models
+
+## 🚀 Quick Install
 
 ```bash
 pip install lion-os
 ```
 
-## Features
+## 💡 Usage Examples
 
-- dynamic strutured output at runtime
-- easily compose any multi-step process, manually or automatically
-- use any model supported by `litellm`
-
-
-## usage pattern
-
-#### Using Branch.communicate
-
-```python
-instruction="Give me some ideas on fastapi coding questions"
-context="we are hiring software engineers"
-```
+### 1️⃣ Simple Communication
 
 ```python
 from lion import iModel, Branch
 
+# Initialize model and branch
 imodel = iModel(
     model="openai/gpt-4o",
     api_key="OPENAI_API_KEY",
     temperature=0.2,
 )
-
-# create a branch
 branch = Branch(imodel=imodel)
 
-# communicate with AI models
+# Basic communication
 result = await branch.communicate(
-    instruction=instruction,
-    context=context
+    instruction="Give me ideas for FastAPI interview questions",
+    context="We're hiring senior engineers"
 )
-
-print(result)
 ```
 
-```plaintext
-Certainly! Here are some concise FastAPI coding questions that you can use to assess the skills of software engineer candidates:
-
-1. **Basic Endpoint Creation:**
-   - Write a simple FastAPI application with a single GET endpoint that returns a JSON response with a message "Hello, World!".
-
-...
-
-```
-
-
-#### Using Branch.operate
+### 2️⃣ Structured Output with Pydantic
 
 ```python
 from pydantic import BaseModel
@@ -63,69 +51,45 @@ class CodingQuestion(BaseModel):
     question: str
     evaluation_criteria: str
 
-result = await branch.operate(
-    instruction=instruction,
-    context=context,
-    operative_model=CodingQuestion,
+# Get structured responses
+questions = await branch.operate(
+    instruction="Generate FastAPI coding questions",
+    context="Technical interview context",
+    operative_model=CodingQuestion
 )
-
-result
 ```
 
-```plaintext
-CodingQuestion(question="Write a FastAPI application with a GET endpoint that returns a JSON response with a message 'Hello, World!'.", evaluation_criteria='Check for correct FastAPI setup, endpoint definition, and JSON response formatting.')
-```
-
-
-#### Using built-in operations
+### 3️⃣ Advanced Operations (Brainstorming)
 
 ```python
 from lion.operations import brainstorm
 
-instruct={
-    "instruction": instruction,
-    "context": context,
-}
-
 result = await brainstorm(
-    instruct=instruct,
+    instruct={
+        "instruction": "Design API endpoints for a todo app",
+        "context": "Building a modern task management system"
+    },
     imodel=imodel,
     num_instruct=3,
     operative_model=CodingQuestion,
-    auto_run=True,
-    invoke_action=False,
+    auto_run=True
 )
 ```
 
-```python
-print("Number of ideas: ", len(result))
-print(type(result[0]))
-print(result[0].model_dump())
-```
+## 🎯 Key Components
 
-```plaintext
-Number of ideas:  6
-<class 'lion.core.models.CodingQuestion'>
-{'question': "Develop a FastAPI endpoint '/user' that processes a POST request with a JSON payload. The payload should include 'first_name', 'last_name', and 'birth_year'. The endpoint must return a JSON response containing 'full_name' and 'age'.", 'evaluation_criteria': "The implementation should correctly use Pydantic models for input validation, handle errors for missing or invalid data gracefully, and accurately calculate the user's age based on the current year (2023). The code should be well-structured, readable, and follow FastAPI best practices.", 'instruct_models': [{'instruction': "Implement a FastAPI endpoint '/user' that accepts a POST request with a JSON payload containing 'first_name', 'last_name', and 'birth_year'. The endpoint should return a JSON response with 'full_name' and 'age'.", 'guidance': 'Use Pydantic models to validate the input data. Ensure the endpoint handles errors gracefully, such as missing or invalid data. Calculate the age based on the current year, 2023.', 'context': "The current year is 2023. Assume the input JSON payload will always contain 'first_name', 'last_name', and 'birth_year'.", 'reason': False, 'actions': False}]}
-```
+| Component | Description |
+|-----------|-------------|
+| Branch | Main conversation controller |
+| MessageManager | Handles message flow and history |
+| ToolManager | Manages function execution and tools |
+| Operative | Structures operations and responses |
 
-```python
-instruct_models = []
-for i in result:
-    if i is not None:
-        instruct_models.extend(getattr(i, "instruct_models", None) or [])
-
-print("Number of ideas for next step: ", len(instruct_models))
-print(type(instruct_models[0]))
-print(instruct_models[0].model_dump())
-```
-
-```plaintext
-Number of ideas for next step:  6
-<class 'lion.protocols.operatives.instruct.InstructModel'>
-{'instruction': "Implement a FastAPI endpoint '/user' that accepts a POST request with a JSON payload containing 'first_name', 'last_name', and 'birth_year'. The endpoint should return a JSON response with 'full_name' and 'age'.", 'guidance': 'Use Pydantic models to validate the input data. Ensure the endpoint handles errors gracefully, such as missing or invalid data. Calculate the age based on the current year, 2023.', 'context': "The current year is 2023. Assume the input JSON payload will always contain 'first_name', 'last_name', and 'birth_year'.", 'reason': False, 'actions': False}
-```
 
 ### Requirements
 
 python 3.11+ required
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/lion-os&type=Date)](https://star-history.com/#yourusername/lion-os)
