@@ -247,9 +247,10 @@ class Branch(Component):
                     recipient=self,
                 )
 
-            api_request = parse_imodel.parse_to_data_model(
-                messages=[instruct.chat_msg], **(retry_kwargs or {})
-            )
+            api_request = {
+                "messages": [instruct.chat_msg],
+                **retry_kwargs,
+            }
             res1 = AssistantResponse(
                 sender=self,
                 recipient=self.user,
