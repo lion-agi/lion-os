@@ -48,6 +48,7 @@ async def brainstorm(
     branch: Branch | ID.Ref | None = None,
     auto_run=True,
     branch_kwargs: dict = {},
+    return_session: bool = False,
     **kwargs,
 ):
     field_models: list = kwargs.get("field_models", [])
@@ -95,13 +96,19 @@ async def brainstorm(
             instructs: list[InstructModel] = res1.instruct_models
             ress = await alcall(instructs, run)
             response_ = []
+
             for res in ress:
                 if isinstance(res, list):
                     response_.extend(res)
                 else:
                     response_.append(res)
 
-            if response_:
-                return response_
+            response_.insert(0, res1)
+            if return_session:
+                return response_, session
+            return response_
+
+    if return_session:
+        return res1, session
 
     return res1
