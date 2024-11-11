@@ -8,11 +8,10 @@ LION_CLASS_REGISTRY: dict[str, type[T]] = {}
 LION_CLASS_FILE_REGISTRY: dict[str, str] = {}
 
 pattern_list = [
-    "autoos/generic",
-    "autoos/communication",
-    "autoos/action",
-    "autoos/form",
-    "autoos/session",
+    "lion/core/generic",
+    "lion/core/communication",
+    "lion/core/action",
+    "lion/core/session",
 ]
 
 
@@ -60,4 +59,4 @@ def get_class(class_name: str) -> type:
         raise ValueError(f"Unable to find class {class_name}: {e}")
 
 
-# File: autoos/util/class_registry_util.py
+# File: lion/core/util/class_registry_util.py

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lion-os"
-version = "0.0.1"
+version = "0.0.2"
 description = ""
 authors = ["HaiyangLi <quantocean.li@gmail.com>"]
 readme = "README.md"
@@ -9,7 +9,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 litellm = "^1.52.3"
 pandas = "^2.2.3"
 
@@ -28,7 +28,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 88
 target-version = ['py311']
-include = '\.pyi?$'
 
 [tool.isort]
 profile = "black"
