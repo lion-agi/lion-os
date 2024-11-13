@@ -15,6 +15,8 @@ from .reason import REASON_FIELD, ReasonModel
 
 
 class StepModel(BaseModel):
+    """Model representing a single operational step with optional reasoning and actions."""
+
     title: str
     description: str
     reason: ReasonModel | None = REASON_FIELD.field_info
@@ -24,28 +26,53 @@ class StepModel(BaseModel):
 
 
 class Step:
+    """Utility class providing methods to create and manage Operative instances for steps."""
 
     @staticmethod
     def request_operative(
         *,
-        operative_name: str = None,
+        operative_name: str | None = None,
         reason: bool = False,
         actions: bool = False,
-        request_params: NewModelParams = None,
-        parameter_fields: dict[str, FieldInfo] = None,
-        base_type: type[BaseModel] = None,
-        field_models: list[FieldModel] = None,
-        exclude_fields: list = None,
+        request_params: NewModelParams | None = None,
+        parameter_fields: dict[str, FieldInfo] | None = None,
+        base_type: type[BaseModel] | None = None,
+        field_models: list[FieldModel] | None = None,
+        exclude_fields: list[str] | None = None,
         new_model_name: str | None = None,
-        field_descriptions: dict = None,
+        field_descriptions: dict[str, str] | None = None,
         inherit_base: bool = True,
         use_base_kwargs: bool = False,
         config_dict: dict | None = None,
         doc: str | None = None,
         frozen: bool = False,
     ) -> Operative:
+        """Creates an Operative instance configured for request handling.
+
+        Args:
+            operative_name (str, optional): Name of the operative.
+            reason (bool, optional): Whether to include reason field.
+            actions (bool, optional): Whether to include action fields.
+            request_params (NewModelParams, optional): Parameters for the new model.
+            parameter_fields (dict[str, FieldInfo], optional): Parameter fields for the model.
+            base_type (type[BaseModel], optional): Base type for the model.
+            field_models (list[FieldModel], optional): List of field models.
+            exclude_fields (list[str], optional): List of fields to exclude.
+            new_model_name (str | None, optional): Name of the new model.
+            field_descriptions (dict[str, str], optional): Descriptions for the fields.
+            inherit_base (bool, optional): Whether to inherit base.
+            use_base_kwargs (bool, optional): Whether to use base kwargs.
+            config_dict (dict | None, optional): Configuration dictionary.
+            doc (str | None, optional): Documentation string.
+            frozen (bool, optional): Whether the model is frozen.
+
+        Returns:
+            Operative: The configured operative instance.
+        """
 
         field_models = field_models or []
+        exclude_fields = exclude_fields or []
+        field_descriptions = field_descriptions or {}
         if reason:
             field_models.append(REASON_FIELD)
         if actions:
@@ -74,20 +101,37 @@ class Step:
     def respond_operative(
         *,
         operative: Operative,
-        additional_data: dict = {},
-        response_params: NewModelParams = None,
-        field_models: list[FieldModel] = [],
-        frozen_reponse: bool = False,
-        response_config_dict=None,
-        response_doc=None,
-        exclude_fields=None,
+        additional_data: dict | None = None,
+        response_params: NewModelParams | None = None,
+        field_models: list[FieldModel] | None = None,
+        frozen_response: bool = False,
+        response_config_dict: dict | None = None,
+        response_doc: str | None = None,
+        exclude_fields: list[str] | None = None,
     ) -> Operative:
+        """Updates the operative with response parameters and data.
 
+        Args:
+            operative (Operative): The operative instance to update.
+            additional_data (dict | None, optional): Additional data to include in the response.
+            response_params (NewModelParams | None, optional): Parameters for the response model.
+            field_models (list[FieldModel] | None, optional): List of field models.
+            frozen_response (bool, optional): Whether the response model is frozen.
+            response_config_dict (dict | None, optional): Configuration dictionary for the response.
+            response_doc (str | None, optional): Documentation string for the response.
+            exclude_fields (list[str] | None, optional): List of fields to exclude.
+
+        Returns:
+            Operative: The updated operative instance.
+        """
+
+        additional_data = additional_data or {}
+        field_models = field_models or []
         operative = Step._create_response_type(
             operative=operative,
             response_params=response_params,
             field_models=field_models,
-            frozen_reponse=frozen_reponse,
+            frozen_response=frozen_response,
             response_config_dict=response_config_dict,
             response_doc=response_doc,
             exclude_fields=exclude_fields,
@@ -101,14 +145,29 @@ class Step:
     @staticmethod
     def _create_response_type(
         operative: Operative,
-        response_params: NewModelParams = None,
-        response_validators: dict = None,
-        frozen_reponse: bool = False,
-        response_config_dict=None,
-        response_doc=None,
-        field_models=None,
-        exclude_fields=None,
+        response_params: NewModelParams | None = None,
+        response_validators: dict | None = None,
+        frozen_response: bool = False,
+        response_config_dict: dict | None = None,
+        response_doc: str | None = None,
+        field_models: list[FieldModel] | None = None,
+        exclude_fields: list[str] | None = None,
     ) -> Operative:
+        """Internal method to create a response type for the operative.
+
+        Args:
+            operative (Operative): The operative instance.
+            response_params (NewModelParams | None, optional): Parameters for the response model.
+            response_validators (dict | None, optional): Validators for the response model.
+            frozen_response (bool, optional): Whether the response model is frozen.
+            response_config_dict (dict | None, optional): Configuration dictionary for the response.
+            response_doc (str | None, optional): Documentation string for the response.
+            field_models (list[FieldModel] | None, optional): List of field models.
+            exclude_fields (list[str] | None, optional): List of fields to exclude.
+
+        Returns:
+            Operative: The operative instance with updated response type.
+        """
 
         field_models = field_models or []
 
@@ -135,7 +194,7 @@ class Step:
             exclude_fields=exclude_fields,
             doc=response_doc,
             config_dict=response_config_dict,
-            frozen=frozen_reponse,
+            frozen=frozen_response,
             validators=response_validators,
         )
         return operative
