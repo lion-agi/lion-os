@@ -1,0 +1,1 @@
+PROMPT = """Develop a detailed plan broken down into {num_steps} steps to accomplish the following task. Each step should be specific and actionable. The plan should be coherent and logically ordered."""
