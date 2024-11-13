@@ -1,6 +1,6 @@
 from abc import ABC
 from collections.abc import Mapping, Sequence
-from typing import Annotated, Generic, TypeAlias, TypeVar
+from typing import Annotated, Any, Generic, TypeAlias, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, PrivateAttr
 from pydantic.fields import FieldInfo
