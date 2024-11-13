@@ -39,14 +39,14 @@ class Branch(Component, BranchActionMixin, BranchOperationMixin):
                 **Settings.Branch.BRANCH.message_log_config.clean_dump()
             )
 
-        tool_manager = data.pop("tool_manager", None)
-        if not tool_manager:
-            tool_manager = ActionManager()
-            tool_manager.logger = LogManager(
+        acts = data.pop("acts", None)
+        if not acts:
+            acts = ActionManager()
+            acts.logger = LogManager(
                 **Settings.Branch.BRANCH.action_log_config.clean_dump()
             )
         if "tools" in data:
-            tool_manager.register_tools(data.pop("tools"))
+            acts.register_tools(data.pop("tools"))
 
         imodel = data.pop(
             "imodel",
@@ -57,7 +57,7 @@ class Branch(Component, BranchActionMixin, BranchOperationMixin):
             "user": user,
             "name": name,
             "msgs": message_manager,
-            "tool_manager": tool_manager,
+            "acts": acts,
             "imodel": imodel,
             **data,
         }
