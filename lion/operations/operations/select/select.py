@@ -4,6 +4,8 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from lion import Branch
+from lion.core.forms.agent_forms import DecisionStage, SelectiveAgentForm
+from lion.core.operatives.agent_operatives import SelectAgentOperative
 from lion.protocols.operatives.instruct import InstructModel
 
 from .prompt import PROMPT
@@ -20,10 +22,13 @@ async def select(
     instruct: InstructModel | dict[str, Any],
     choices: list[str] | type[Enum] | dict[str, Any],
     max_num_selections: int = 1,
+    agent_form: SelectiveAgentForm | None = None,
+    use_agent_decision: bool = False,
     branch: Branch | None = None,
     branch_kwargs: dict[str, Any] | None = None,
     return_branch: bool = False,
     verbose: bool = False,
+    agent_operative: SelectAgentOperative | None = None,
     **kwargs: Any,
 ) -> SelectionModel | tuple[SelectionModel, Branch]:
     """Perform a selection operation from given choices.
@@ -32,15 +37,33 @@ async def select(
         instruct: Instruction model or dictionary.
         choices: Options to select from.
         max_num_selections: Maximum selections allowed.
+        agent_form: Optional agent form for selection.
+        use_agent_decision: Whether to use the agent decision framework.
         branch: Existing branch or None to create a new one.
         branch_kwargs: Additional arguments for branch creation.
         return_branch: If True, return the branch with the selection.
         verbose: Whether to enable verbose output.
+        agent_operative: Optional agent operative for selection.
         **kwargs: Additional keyword arguments.
 
     Returns:
         A SelectionModel instance, optionally with the branch.
     """
+    if agent_operative:
+        return await agent_operative.execute()
+
+    if agent_form:
+        return await agent_form.execute()
+
+    if use_agent_decision:
+        form = SelectiveAgentForm(
+            choices=choices,
+            max_selections=max_num_selections,
+            guidance=instruct.get("guidance", ""),
+            context=instruct.get("context", {}),
+        )
+        return await form.make_decision()
+
     if verbose:
         print(f"Starting selection with up to {max_num_selections} choices.")
 
