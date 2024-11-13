@@ -32,7 +32,7 @@ async def run_step(
             ins.guidance[:100] + "..." if len(ins.guidance) > 100 else ins.guidance
         )
         print(f"Executing step: {guidance_preview}")
-    config = {**ins.model_dump(), **kwargs}
+    config = {**ins.clean_dump(), **kwargs}
     res = await branch.operate(**config)
     branch.msgs.logger.dump()
     return res
