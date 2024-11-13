@@ -444,7 +444,7 @@ class Note(BaseAutoModel):
             kwargs: Additional keyword arguments for flattening
         """
         if flat:
-            kwargs["coerce_keys"] = kwargs.get("coerce_keys", True)
+            kwargs["coerce_keys"] = kwargs.get("coerce_keys", False)
             kwargs["coerce_sequence"] = kwargs.get("coerce_sequence", "list")
             return flatten(self.content, **kwargs).keys()
         return list(self.content.keys())
@@ -458,7 +458,7 @@ class Note(BaseAutoModel):
             kwargs: Additional keyword arguments for flattening
         """
         if flat:
-            kwargs["coerce_keys"] = kwargs.get("coerce_keys", True)
+            kwargs["coerce_keys"] = kwargs.get("coerce_keys", False)
             kwargs["coerce_sequence"] = kwargs.get("coerce_sequence", "list")
             return flatten(self.content, **kwargs).values()
         return self.content.values()
@@ -472,7 +472,7 @@ class Note(BaseAutoModel):
             kwargs: Additional keyword arguments for flattening
         """
         if flat:
-            kwargs["coerce_keys"] = kwargs.get("coerce_keys", True)
+            kwargs["coerce_keys"] = kwargs.get("coerce_keys", False)
             kwargs["coerce_sequence"] = kwargs.get("coerce_sequence", "list")
             return flatten(self.content, **kwargs).items()
         return self.content.items()
