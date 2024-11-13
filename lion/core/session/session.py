@@ -5,7 +5,7 @@ import pandas as pd
 from lion.integrations.litellm_.imodel import iModel
 from lion.libs.parse import to_list
 
-from ..action.tool_manager import Tool, ToolManager
+from ..action.action_manager import ActionManager, Tool
 from ..communication.message import MESSAGE_FIELDS, RoledMessage
 from ..communication.system import System
 from ..generic import Component, Pile, Progression
@@ -37,7 +37,7 @@ class Session(Component):
         imodel: iModel = None,
         messages: Pile[RoledMessage] = None,
         progress: Progression = None,
-        tool_manager: ToolManager = None,
+        tool_manager: ActionManager = None,
         tools: Tool | Callable | list = None,
         **kwargs,  # additional branch parameters
     ) -> Branch:
