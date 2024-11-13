@@ -8,6 +8,7 @@ from lion.libs.parse import UNDEFINED, to_json, validate_keys
 
 
 class Operative(OperableModel):
+    """Class representing an operative that handles request and response models for operations."""
 
     name: str | None = None
 
@@ -25,13 +26,22 @@ class Operative(OperableModel):
 
     @model_validator(mode="after")
     def _validate(self) -> Self:
+        """Validates the operative instance after initialization."""
         if self.request_type is None:
             self.request_type = self.request_params.create_new_model()
         if self.name is None:
             self.name = self.request_params.name or self.request_type.__name__
         return self
 
-    def raise_validate_pydantic(self, text: str):
+    def raise_validate_pydantic(self, text: str) -> None:
+        """Validates and updates the response model using strict matching.
+
+        Args:
+            text (str): The text to validate and parse into the response model.
+
+        Raises:
+            Exception: If the validation fails.
+        """
         d_ = to_json(text, fuzzy_parse=True)
         if isinstance(d_, list | tuple) and len(d_) == 1:
             d_ = d_[0]
@@ -47,6 +57,11 @@ class Operative(OperableModel):
             self._should_retry = True
 
     def force_validate_pydantic(self, text: str):
+        """Forcibly validates and updates the response model, allowing unmatched fields.
+
+        Args:
+            text (str): The text to validate and parse into the response model.
+        """
         d_ = text
         try:
             d_ = to_json(text, fuzzy_parse=True)
@@ -64,9 +79,20 @@ class Operative(OperableModel):
             self._should_retry = True
 
     def update_response_model(
-        self, text: str = None, data: dict = None
+        self, text: str | None = None, data: dict | None = None
     ) -> BaseModel | dict | str | None:
+        """Updates the response model based on the provided text or data.
 
+        Args:
+            text (str, optional): The text to parse and validate.
+            data (dict, optional): The data to update the response model with.
+
+        Returns:
+            BaseModel | dict | str | None: The updated response model or raw data.
+
+        Raises:
+            ValueError: If neither text nor data is provided.
+        """
         if text is None and data is None:
             raise ValueError("Either text or data must be provided.")
 
@@ -95,18 +121,33 @@ class Operative(OperableModel):
 
     def create_response_type(
         self,
-        response_params: NewModelParams = None,
-        field_models: list[FieldModel] = [],
-        parameter_fields: dict[str, FieldInfo] = None,
-        exclude_fields: list = [],
-        field_descriptions: dict = {},
+        response_params: NewModelParams | None = None,
+        field_models: list[FieldModel] | None = None,
+        parameter_fields: dict[str, FieldInfo] | None = None,
+        exclude_fields: list[str] | None = None,
+        field_descriptions: dict[str, str] | None = None,
         inherit_base: bool = True,
         use_base_kwargs: bool = False,
         config_dict: dict | None = None,
         doc: str | None = None,
         frozen: bool = False,
-        validators=None,
-    ):
+        validators: dict | None = None,
+    ) -> None:
+        """Creates a new response type based on the provided parameters.
+
+        Args:
+            response_params (NewModelParams, optional): Parameters for the new response model.
+            field_models (list[FieldModel], optional): List of field models.
+            parameter_fields (dict[str, FieldInfo], optional): Dictionary of parameter fields.
+            exclude_fields (list, optional): List of fields to exclude.
+            field_descriptions (dict, optional): Dictionary of field descriptions.
+            inherit_base (bool, optional): Whether to inherit the base model.
+            use_base_kwargs (bool, optional): Whether to use base keyword arguments.
+            config_dict (dict | None, optional): Configuration dictionary.
+            doc (str | None, optional): Documentation string.
+            frozen (bool, optional): Whether the model is frozen.
+            validators (dict, optional): Dictionary of validators.
+        """
         self.response_params = response_params or NewModelParams(
             parameter_fields=parameter_fields,
             field_models=field_models,

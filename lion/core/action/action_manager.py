@@ -16,7 +16,7 @@ INPUTTABLE_TOOL = dict[str, Any] | bool | FINDABLE_TOOL
 TOOL_TYPE = FINDABLE_TOOL | list[FINDABLE_TOOL] | INPUTTABLE_TOOL
 
 
-class ToolManager:
+class ActionManager:
 
     def __init__(self, registry: dict[str, Tool] | None = None, logger=None) -> None:
         """Initialize the ToolManager instance.
@@ -255,5 +255,5 @@ class ToolManager:
         raise TypeError(f"Unsupported type {type(tool)}")
 
 
-__all__ = ["ToolManager"]
+__all__ = ["ActionManager"]
 # File: autoos/action/tool_manager.py

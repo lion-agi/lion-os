@@ -58,7 +58,7 @@ def parse_action_request(content: str | dict) -> list[dict]:
     return out
 
 
-def _validate_function_name(cls, value):
+def _validate_function_name(cls, value: Any) -> str | None:
     if not isinstance(value, str):
         return None
     return value
@@ -71,7 +71,7 @@ def _validate_action_required(cls, value) -> bool:
         return False
 
 
-def _validate_arguments(cls, value):
+def _validate_arguments(cls, value: Any) -> dict:
     return to_dict(
         value,
         fuzzy_parse=True,

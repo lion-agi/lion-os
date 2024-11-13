@@ -1,3 +1,5 @@
+from pydantic import JsonValue
+
 function_field_description = (
     "Specify the name of the function to execute. **Choose "
     "from the provided `tool_schemas`; do not invent function names.**"
@@ -114,7 +116,7 @@ actions_field_description = (
 )
 
 # Example structures for each field to demonstrate proper formatting
-instruction_examples = [
+instruction_examples: list[JsonValue] = [
     "Analyze the dataset 'sales_2023.csv' and identify revenue trends",
     "Create a Python function to process customer feedback data",
     {
@@ -124,7 +126,7 @@ instruction_examples = [
     },
 ]
 
-guidance_examples = [
+guidance_examples: list[JsonValue] = [
     "Use statistical methods for trend analysis",
     "Optimize for readability and maintainability",
     {
@@ -133,7 +135,7 @@ guidance_examples = [
     },
 ]
 
-context_examples = [
+context_examples: list[JsonValue] = [
     "Previous analysis showed seasonal patterns",
     {
         "prior_results": {"accuracy": 0.95},

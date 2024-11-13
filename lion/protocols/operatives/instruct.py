@@ -1,4 +1,4 @@
-"""Field definitions for InstructModel components."""
+"""Field definitions and validation for InstructModel components."""
 
 from pydantic import JsonValue, field_validator
 
@@ -18,14 +18,30 @@ from .prompts import (
 
 
 def validate_instruction(cls, value) -> JsonValue | None:
-    """Validates that instruction is not empty/None and is in correct format"""
+    """Validates that the instruction is not empty or None and is in the correct format.
+
+    Args:
+        cls: The validator class method.
+        value (JsonValue | None): The instruction value to validate.
+
+    Returns:
+        JsonValue | None: The validated instruction or None if invalid.
+    """
     if value is None or (isinstance(value, str) and not value.strip()):
         return None
     return value
 
 
 def validate_boolean_field(cls, value) -> bool | None:
-    """Validates boolean fields, allowing for flexible input formats"""
+    """Validates boolean fields, allowing for flexible input formats.
+
+    Args:
+        cls: The validator class method.
+        value: The value to validate as boolean.
+
+    Returns:
+        bool | None: The validated boolean value or None if invalid.
+    """
     try:
         return validate_boolean(value)
     except Exception:
@@ -84,7 +100,15 @@ ACTIONS_FIELD = FieldModel(
 
 
 class InstructModel(SchemaModel):
-    """Model for defining instruction parameters and execution requirements."""
+    """Model for defining instruction parameters and execution requirements.
+
+    Attributes:
+        instruction (JsonValue | None): The primary instruction.
+        guidance (JsonValue | None): Execution guidance.
+        context (JsonValue | None): Task context.
+        reason (bool): Whether to include reasoning.
+        actions (bool): Whether specific actions are required.
+    """
 
     instruction: JsonValue | None = INSTRUCTION_FIELD.field_info
     guidance: JsonValue | None = GUIDANCE_FIELD.field_info
@@ -94,14 +118,38 @@ class InstructModel(SchemaModel):
 
     @field_validator("instruction", **INSTRUCTION_FIELD.validator_kwargs)
     def _validate_instruction(cls, v):
+        """Field validator for the 'instruction' field.
+
+        Args:
+            v: The value to validate.
+
+        Returns:
+            JsonValue | None: The validated instruction value.
+        """
         return INSTRUCTION_FIELD.validator(cls, v)
 
     @field_validator("reason", **REASON_FIELD.validator_kwargs)
     def _validate_reason(cls, v):
+        """Field validator for the 'reason' field.
+
+        Args:
+            v: The value to validate.
+
+        Returns:
+            bool | None: The validated boolean value.
+        """
         return REASON_FIELD.validator(cls, v)
 
     @field_validator("actions", **ACTIONS_FIELD.validator_kwargs)
     def _validate_actions(cls, v):
+        """Field validator for the 'actions' field.
+
+        Args:
+            v: The value to validate.
+
+        Returns:
+            bool | None: The validated boolean value.
+        """
         return ACTIONS_FIELD.validator(cls, v)
 
 

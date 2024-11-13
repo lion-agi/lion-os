@@ -11,20 +11,40 @@ from .utils import parse_selection, parse_to_representation
 
 
 class SelectionModel(BaseModel):
-    selected: list = Field(default_factory=list)
+    """Model representing the selection output."""
+
+    selected: list[Any] = Field(default_factory=list)
 
 
 async def select(
-    instruct: dict | InstructModel,
+    instruct: InstructModel | dict[str, Any],
     choices: list[str] | type[Enum] | dict[str, Any],
     max_num_selections: int = 1,
-    branch: Branch = None,
-    branch_kwargs: dict = {},
-    return_branch=False,
-    **kwargs,
+    branch: Branch | None = None,
+    branch_kwargs: dict[str, Any] | None = None,
+    return_branch: bool = False,
+    verbose: bool = False,
+    **kwargs: Any,
 ) -> SelectionModel | tuple[SelectionModel, Branch]:
+    """Perform a selection operation from given choices.
 
-    branch = branch or Branch(**branch_kwargs)
+    Args:
+        instruct: Instruction model or dictionary.
+        choices: Options to select from.
+        max_num_selections: Maximum selections allowed.
+        branch: Existing branch or None to create a new one.
+        branch_kwargs: Additional arguments for branch creation.
+        return_branch: If True, return the branch with the selection.
+        verbose: Whether to enable verbose output.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        A SelectionModel instance, optionally with the branch.
+    """
+    if verbose:
+        print(f"Starting selection with up to {max_num_selections} choices.")
+
+    branch = branch or Branch(**(branch_kwargs or {}))
     selections, contents = parse_to_representation(choices)
     prompt = PROMPT.format(max_num_selections=max_num_selections, choices=selections)
 
@@ -48,6 +68,9 @@ async def select(
         **kwargs,
         **instruct,
     )
+    if verbose:
+        print(f"Received selection: {response_model.selected}")
+
     selected = response_model
     if isinstance(response_model, BaseModel) and hasattr(response_model, "selected"):
         selected = response_model.selected

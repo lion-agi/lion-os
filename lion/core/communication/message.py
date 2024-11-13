@@ -31,6 +31,7 @@ class MessageFlag(str, Enum):
 
 
 class MessageField(str, Enum):
+    """Enum for possible fields a message can have."""
 
     TIMESTAMP = "timestamp"
     LION_CLASS = "lion_class"
@@ -94,7 +95,15 @@ class RoledMessage(Component, BaseMail):
 
     @field_validator("role")
     def _validate_role(cls, v: Any) -> MessageRole | None:
-        """Validates the role of the message."""
+        """
+        Validates the role of the message.
+
+        Args:
+            v (Any): The role value to validate.
+
+        Returns:
+            MessageRole | None: The validated role, or None if invalid.
+        """
         if v in [r.value for r in MessageRole]:
             return MessageRole(v)
         raise ValueError(f"Invalid message role: {v}")
@@ -194,8 +203,15 @@ class RoledMessage(Component, BaseMail):
 
     @field_serializer("content")
     def _serialize_content(self, value: Note) -> dict[str, Any]:
-        """Serialize the content"""
+        """
+        Serialize the content.
 
+        Args:
+            value (Note): The content to serialize.
+
+        Returns:
+            dict[str, Any]: The serialized content.
+        """
         output_dict = copy(value.content, deep=True)
         origin_obj = output_dict.pop("clone_from", None)
 
@@ -213,15 +229,26 @@ class RoledMessage(Component, BaseMail):
 
     @field_serializer("role")
     def _serialize_role(self, value: MessageRole):
+        """
+        Serialize the role.
+
+        Args:
+            value (MessageRole): The role to serialize.
+
+        Returns:
+            str: The serialized role.
+        """
         return value.value
 
     def _format_content(self) -> dict[str, Any]:
-        """Format the message content for chat representation."""
+        """
+        Format the message content for chat representation.
+
+        Returns:
+            dict[str, Any]: The formatted content.
+        """
         if self.content.get("images", None):
             content = self.content.to_dict()
         else:
             content = str(self.content.to_dict())
         return {"role": self.role.value, "content": content}
-
-
-# File: autoos/communication/message.py
