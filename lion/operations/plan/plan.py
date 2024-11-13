@@ -74,7 +74,7 @@ async def plan(
     kwargs["field_models"] = field_models
 
     session = session or Session()
-    branch = branch or session.new_branch(**branch_kwargs)
+    branch = branch or session.new_branch(**(branch_kwargs or {}))
 
     if isinstance(instruct, InstructModel):
         instruct = instruct.clean_dump()
@@ -95,7 +95,7 @@ async def plan(
             return res1, session
         return res1
 
-    results = [res1]
+    results = res1 if isinstance(res1, list) else [res1]
     if hasattr(res1, "instruct_models"):
         instructs: list[InstructModel] = res1.instruct_models
         for i, ins in enumerate(instructs, 1):

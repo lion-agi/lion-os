@@ -102,14 +102,14 @@ async def brainstorm(
         if branch is not None:
             branch: Branch = session.branches[branch]
         else:
-            branch = session.new_branch(**branch_kwargs)
+            branch = session.new_branch(**(branch_kwargs or {}))
     else:
         session = Session()
         if isinstance(branch, Branch):
             session.branches.include(branch)
             session.default_branch = branch
         if branch is None:
-            branch = session.new_branch(**branch_kwargs)
+            branch = session.new_branch(**(branch_kwargs or {}))
 
     if isinstance(instruct, InstructModel):
         instruct = instruct.clean_dump()
