@@ -1,3 +1,3 @@
-from .select import select
+from .select import SelectForm, select
 
-__all__ = ["select"]
+__all__ = ["select", "SelectForm"]
