@@ -2,7 +2,7 @@ from typing import Any
 
 from lion.core.session.branch import Branch
 from lion.core.session.session import Session
-from lion.core.types import ID
+from lion.core.typing import ID
 from lion.libs.func import alcall
 from lion.protocols.operatives.instruct import INSTRUCT_MODEL_FIELD, InstructModel
 

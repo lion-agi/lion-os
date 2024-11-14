@@ -3,13 +3,13 @@ from pathlib import Path
 import pandas as pd
 from pydantic import model_validator
 
+from lion.core.generic import Component, LogManager, Pile, Progression
+from lion.core.typing import ID
 from lion.integrations.litellm_.imodel import iModel
 from lion.settings import Settings
 
 from ..action.action_manager import ActionManager
 from ..communication import MESSAGE_FIELDS, MessageManager
-from ..generic import Component, LogManager, Pile, Progression
-from ..types import ID
 from .branch_mixins import BranchActionMixin, BranchOperationMixin
 
 

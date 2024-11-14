@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
-from lion.core.types import FieldModel, NewModelParams
+from lion.core.typing import FieldModel, NewModelParams
 from lion.protocols.operatives.operative import Operative
 
 from .action import (

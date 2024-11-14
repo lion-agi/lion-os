@@ -5,6 +5,7 @@ from typing import Literal
 
 from pydantic import JsonValue
 
+from lion.core.typing import ID, UNDEFINED, BaseModel, FieldModel, NewModelParams
 from lion.integrations.litellm_.imodel import iModel
 from lion.integrations.pydantic_ import break_down_pydantic_annotation
 from lion.libs.func import alcall
@@ -23,7 +24,6 @@ from ..communication import (
     AssistantResponse,
     Instruction,
 )
-from ..types import ID, UNDEFINED, BaseModel, FieldModel, NewModelParams
 
 
 class BranchActionMixin(ABC):
