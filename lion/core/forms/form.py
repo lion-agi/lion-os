@@ -1,12 +1,18 @@
 import inspect
-from typing import Any, Literal, TypeVar
+from typing import Literal
 
 from pydantic import model_validator
-from pydantic.fields import FieldInfo
-from pydantic_core import PydanticUndefined
 from typing_extensions import override
 
-from lion.core.types import UNDEFINED, Field, Note
+from lion.core.typing import (
+    UNDEFINED,
+    Any,
+    Field,
+    FieldInfo,
+    Note,
+    PydanticUndefined,
+    TypeVar,
+)
 from lion.libs.utils import copy
 
 from .base import BaseForm

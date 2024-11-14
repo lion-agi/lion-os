@@ -2,7 +2,7 @@ import inspect
 from enum import Enum
 from typing import Any
 
-from lion.core.types import BaseModel, JsonValue
+from lion.core.typing import BaseModel, JsonValue
 from lion.libs.parse import is_same_dtype, string_similarity
 
 

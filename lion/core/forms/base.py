@@ -1,9 +1,7 @@
-from typing import Any, Literal
-
 from pydantic import field_validator
 
 from lion.core.generic import Component
-from lion.core.types import UNDEFINED, Field, PydanticUndefined
+from lion.core.typing import UNDEFINED, Any, Field, Literal, PydanticUndefined
 
 
 class BaseForm(Component):

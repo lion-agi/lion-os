@@ -9,11 +9,7 @@ import pandas as pd
 from pydantic import field_serializer
 from typing_extensions import override
 
-from lion.libs.parse import is_same_dtype, to_list
-from lion.protocols.adapters.adapter import Adapter, AdapterRegistry
-from lion.protocols.registries._pile_registry import PileAdapterRegistry
-
-from ..types import (
+from lion.core.typing import (
     ID,
     UNDEFINED,
     Field,
@@ -22,6 +18,10 @@ from ..types import (
     ItemNotFoundError,
     Observable,
 )
+from lion.libs.parse import is_same_dtype, to_list
+from lion.protocols.adapters.adapter import Adapter, AdapterRegistry
+from lion.protocols.registries._pile_registry import PileAdapterRegistry
+
 from .element import Element
 from .progression import Progression
 from .utils import to_list_type, validate_order

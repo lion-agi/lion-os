@@ -1,15 +1,12 @@
 import json
 from collections.abc import Callable
 from datetime import datetime
-from typing import Any, Literal
 
 from pydantic import field_serializer, field_validator
-from typing_extensions import override
 
+from lion.core.generic.element import Element
+from lion.core.typing import Any, Field, Literal, override
 from lion.libs.parse import function_to_schema, to_list
-
-from ..generic.element import Element
-from ..types import Field
 
 
 class Tool(Element):
@@ -33,7 +30,7 @@ class Tool(Element):
         default=None,
         description="Schema of the function in OpenAI format.",
     )
-    pre_processor: Callable[..., dict[str, Any]] | None = Field(
+    pre_processor: Callable[[Any], Any] | None = Field(
         default=None,
         description="Function to preprocess input arguments.",
     )
@@ -41,7 +38,7 @@ class Tool(Element):
         default=None,
         description="Keyword arguments for the pre-processor.",
     )
-    post_processor: Callable[..., Any] | None = Field(
+    post_processor: Callable[[Any], Any] | None = Field(
         default=None,
         description="Function to post-process the result.",
     )
@@ -163,4 +160,3 @@ def func_to_tool(
 
 
 __all__ = ["Tool", "func_to_tool"]
-# File: autoos/action/tool.py

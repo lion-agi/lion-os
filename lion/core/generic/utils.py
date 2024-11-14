@@ -2,7 +2,8 @@ from collections import deque
 from collections.abc import Generator
 from typing import Any, TypeVar
 
-from ..types import ID, IDError
+from lion.core.typing import ID, IDError
+
 from .element import Element
 
 T = TypeVar("T")

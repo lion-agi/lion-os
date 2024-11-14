@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 import inspect
-from enum import Enum
-from typing import Any
 
 from pydantic import field_serializer, field_validator
-from typing_extensions import override
 
+from lion.core.generic import Component, Log
+from lion.core.typing import Any, Communicatable, Enum, Field, Note, override
 from lion.libs.utils import copy
 
 from .._class_registry import get_class
-from ..generic import Component, Log
-from ..types import Communicatable, Field, Note
 from .base_mail import BaseMail
 
 

@@ -1,14 +1,24 @@
+"""Base element module for the Lion framework."""
+
 from datetime import datetime
-from typing import Any, TypeVar
 
 from pydantic import field_validator
 from typing_extensions import override
 
+from lion.core._class_registry import LION_CLASS_REGISTRY, get_class
+from lion.core.typing import (
+    ID,
+    Any,
+    BaseModel,
+    ConfigDict,
+    Field,
+    IDError,
+    LnID,
+    Observable,
+    TypeVar,
+)
 from lion.libs.utils import time
 from lion.settings import Settings
-
-from .._class_registry import LION_CLASS_REGISTRY, get_class
-from ..types import ID, BaseModel, ConfigDict, Field, IDError, LnID, Observable
 
 T = TypeVar("T", bound=Observable)
 
@@ -95,6 +105,7 @@ class Element(BaseModel, Observable):
 
     @override
     def __str__(self) -> str:
+        """Return a string representation of the Element."""
         timestamp_str = self.created_datetime.isoformat(timespec="minutes")
         return (
             f"{self.class_name()}(ln_id={self.ln_id[:6]}.., "
@@ -114,5 +125,3 @@ class Element(BaseModel, Observable):
 
 
 __all__ = ["Element"]
-
-# File: autoos/generic/element.py

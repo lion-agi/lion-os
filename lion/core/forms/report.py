@@ -1,5 +1,5 @@
 from lion.core.generic import Pile
-from lion.core.types import UNDEFINED, Field
+from lion.core.typing import UNDEFINED, Field
 
 from .base import BaseForm
 from .form import Form

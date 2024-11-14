@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, Literal
-
-from typing_extensions import override
-
+from lion.core.typing import ID, Any, BaseModel, JsonValue, Literal, override
 from lion.integrations.pydantic_ import break_down_pydantic_annotation
 from lion.libs.parse import to_str
 from lion.libs.utils import copy
 
-from ..types import ID, BaseModel, JsonValue
 from .message import MessageFlag, MessageRole, RoledMessage
 from .utils import (
     format_image_content,

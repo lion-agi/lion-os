@@ -1,11 +1,9 @@
-from typing import Any
-
 from typing_extensions import override
 
+from lion.core.typing import ID, Any, BaseModel, JsonValue, Note
 from lion.libs.parse import to_str
 from lion.libs.utils import copy
 
-from ..types import ID, BaseModel, JsonValue, Note
 from .message import MessageFlag, MessageRole, RoledMessage
 
 

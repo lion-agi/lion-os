@@ -1,10 +1,8 @@
-from typing import Any
-
 from typing_extensions import override
 
+from lion.core.typing import ID, Any, Note
 from lion.libs.utils import copy
 
-from ..types import ID, Note
 from .action_request import ActionRequest
 from .message import MessageFlag, MessageRole, RoledMessage
 
