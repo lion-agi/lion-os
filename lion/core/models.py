@@ -56,6 +56,9 @@ class BaseAutoModel(BaseModel):
     def from_dict(cls, data: dict) -> Self:
         return cls.model_validate(data)
 
+    def __hash__(self) -> int:
+        return hash(str(self.clean_dump()))
+
 
 class SchemaModel(BaseAutoModel):
 
@@ -64,9 +67,6 @@ class SchemaModel(BaseAutoModel):
     @classmethod
     def keys(cls) -> list[str]:
         return list(cls.model_fields.keys())
-
-    def __hash__(self) -> int:
-        return hash(str(self.clean_dump()))
 
 
 class FieldModel(SchemaModel):
