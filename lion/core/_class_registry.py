@@ -12,6 +12,7 @@ pattern_list = [
     "lion/core/communication",
     "lion/core/action",
     "lion/core/session",
+    "lion/core/forms",
 ]
 
 
