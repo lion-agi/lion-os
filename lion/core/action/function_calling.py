@@ -38,8 +38,13 @@ class FunctionCalling(ObservableAction):
         timed_config: dict | TimedFuncCallConfig = None,
         **kwargs: Any,
     ) -> None:
-        """
-        kwargs for timed config
+        """Initialize a FunctionCalling instance.
+
+        Args:
+            func_tool: Tool containing the function to be invoked.
+            arguments: Arguments for the function invocation.
+            timed_config: Configuration for timing and retries.
+            **kwargs: Additional keyword arguments.
         """
         super().__init__(timed_config=timed_config, **kwargs)
         self.func_tool = func_tool
@@ -59,34 +64,30 @@ class FunctionCalling(ObservableAction):
         Raises:
             Exception: If function call or processing steps fail.
         """
-
-        @cd.pre_post_process(
-            preprocess=self.func_tool.pre_processor,
-            preprocess_kwargs=self.func_tool.pre_processor_kwargs,
-        )
-        async def _inner(**kwargs) -> tuple[Any, Any | float]:
-            kwargs["retry_timing"] = True
-            result, elp = await tcall(self.func_tool.function, **kwargs)
-            if self.func_tool.post_processor:
-                kwargs = self.func_tool.post_processor_kwargs or {}
-                kwargs = {
-                    **kwargs,
-                    **self._timed_config.to_dict(),
-                    "retry_timing": True,
-                }
-                result, elp2 = await tcall(
-                    self.func_tool.post_processor, result, **kwargs
-                )
-                elp += elp2
-            return result, elp
-
         start = asyncio.get_event_loop().time()
         try:
-            result, elp = await _inner(**self.arguments)
+            # Create inner function with pre/post processing
+            @cd.pre_post_process(
+                preprocess=self.func_tool.pre_processor,
+                postprocess=self.func_tool.post_processor,
+                preprocess_kwargs=self.func_tool.pre_processor_kwargs or {},
+                postprocess_kwargs=self.func_tool.post_processor_kwargs or {},
+            )
+            async def _inner(**kwargs) -> Any:
+                config = self._timed_config.to_dict()
+                result = await tcall(self.func_tool.function, **kwargs, **config)
+                # Handle tuple result from tcall when retry_timing is True
+                if isinstance(result, tuple) and len(result) == 2:
+                    return result[0]  # Return just the result, not timing info
+                return result
+
+            # Execute function with pre/post processing
+            result = await _inner(**self.arguments)
             self.execution_response = result
-            self.execution_time = elp
+            self.execution_time = asyncio.get_event_loop().time() - start
             self.status = EventStatus.COMPLETED
 
+            # Apply parser if defined
             if self.func_tool.parser is not None:
                 if asyncio.iscoroutinefunction(self.func_tool.parser):
                     result = await self.func_tool.parser(result)
@@ -98,6 +99,7 @@ class FunctionCalling(ObservableAction):
             self.status = EventStatus.FAILED
             self.execution_error = str(e)
             self.execution_time = asyncio.get_event_loop().time() - start
+            return None
 
     def __str__(self) -> str:
         """Returns a string representation of the function call."""
@@ -112,4 +114,3 @@ class FunctionCalling(ObservableAction):
 
 
 __all__ = ["FunctionCalling"]
-# File: autoos/action/function_calling.py

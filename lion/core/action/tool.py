@@ -33,7 +33,7 @@ class Tool(Element):
         default=None,
         description="Schema of the function in OpenAI format.",
     )
-    pre_processor: Callable[..., dict[str, Any]] | None = Field(
+    pre_processor: Callable[[Any], Any] | None = Field(
         default=None,
         description="Function to preprocess input arguments.",
     )
@@ -41,7 +41,7 @@ class Tool(Element):
         default=None,
         description="Keyword arguments for the pre-processor.",
     )
-    post_processor: Callable[..., Any] | None = Field(
+    post_processor: Callable[[Any], Any] | None = Field(
         default=None,
         description="Function to post-process the result.",
     )
@@ -163,4 +163,3 @@ def func_to_tool(
 
 
 __all__ = ["Tool", "func_to_tool"]
-# File: autoos/action/tool.py
