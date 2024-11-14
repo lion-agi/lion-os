@@ -4,7 +4,7 @@ from typing import Literal
 from pydantic import model_validator
 from typing_extensions import override
 
-from lion.core.types import (
+from lion.core.typing import (
     UNDEFINED,
     Any,
     Field,
