@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lion-os"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = ["HaiyangLi <quantocean.li@gmail.com>"]
 readme = "README.md"
