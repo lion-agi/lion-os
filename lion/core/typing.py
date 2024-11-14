@@ -1,10 +1,21 @@
 from abc import ABC
 from collections.abc import Mapping, Sequence
-from typing import Annotated, Any, Generic, TypeAlias, TypeVar
+from enum import Enum
+from typing import (
+    Annotated,
+    Any,
+    ClassVar,
+    Generic,
+    Literal,
+    NoReturn,
+    TypeAlias,
+    TypeVar,
+)
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, PrivateAttr
 from pydantic.fields import FieldInfo
 from pydantic_core import PydanticUndefined
+from typing_extensions import override
 
 from lion.libs.constants import UNDEFINED, UndefinedType
 from lion.libs.utils import insert_random_hyphens, unique_hash
