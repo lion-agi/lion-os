@@ -1,13 +1,12 @@
 import asyncio
-from typing import Any
 
 from typing_extensions import override
 
+from lion.core.typing import Any, Field, PrivateAttr
 from lion.libs.func import CallDecorator as cd
 from lion.libs.func import tcall
 from lion.settings import TimedFuncCallConfig
 
-from ..types import Field, PrivateAttr
 from .base import EventStatus, ObservableAction
 from .tool import Tool
 

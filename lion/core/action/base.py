@@ -1,12 +1,6 @@
-from enum import Enum
-from typing import Any, NoReturn
-
-from typing_extensions import override
-
+from lion.core.generic import Element, Log
+from lion.core.typing import Any, Enum, NoReturn, PrivateAttr, override
 from lion.settings import Settings, TimedFuncCallConfig
-
-from ..generic import Element, Log
-from ..types import PrivateAttr
 
 
 class EventStatus(str, Enum):

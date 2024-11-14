@@ -1,15 +1,12 @@
 import json
 from collections.abc import Callable
 from datetime import datetime
-from typing import Any, Literal
 
 from pydantic import field_serializer, field_validator
-from typing_extensions import override
 
+from lion.core.generic.element import Element
+from lion.core.typing import Any, Field, Literal, override
 from lion.libs.parse import function_to_schema, to_list
-
-from ..generic.element import Element
-from ..types import Field
 
 
 class Tool(Element):

@@ -1,12 +1,12 @@
 from collections.abc import Callable
 from functools import singledispatchmethod
-from typing import Any
 
+from lion.core.generic.log_manager import LogManager
+from lion.core.typing import Any
 from lion.libs.parse import to_dict, to_list
 from lion.protocols.operatives.action import ActionRequestModel
 
 from ..communication.action_request import ActionRequest
-from ..generic.log_manager import LogManager
 from .function_calling import FunctionCalling
 from .tool import Tool, func_to_tool
 
