@@ -1,9 +1,6 @@
-from typing import Any, Literal
-
+from lion.core.typing import ID, UNDEFINED, Any, BaseModel, IDError, Literal, LnID, Note
 from lion.integrations.pydantic_ import break_down_pydantic_annotation
 from lion.libs.utils import time
-
-from ..types import ID, UNDEFINED, BaseModel, IDError, LnID, Note
 
 DEFAULT_SYSTEM = "You are a helpful AI assistant. Let's think step by step."
 

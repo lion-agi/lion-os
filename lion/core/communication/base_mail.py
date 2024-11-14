@@ -2,8 +2,9 @@ from typing import Any
 
 from pydantic import field_validator
 
-from ..generic.element import Element
-from ..types import ID, Communicatable, Field
+from lion.core.generic.element import Element
+from lion.core.typing import ID, Communicatable, Field
+
 from .utils import validate_sender_recipient
 
 

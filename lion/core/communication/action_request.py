@@ -1,12 +1,11 @@
 from collections.abc import Callable
-from typing import Any
 
 from typing_extensions import override
 
+from lion.core.typing import ID, Any, LnID, Note
 from lion.libs.parse import to_dict
 from lion.libs.utils import copy
 
-from ..types import ID, LnID, Note
 from .message import MessageFlag, MessageRole, RoledMessage
 
 

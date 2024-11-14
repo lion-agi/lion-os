@@ -1,7 +1,6 @@
-from typing import Any, Literal
+from lion.core.generic import LogManager, Pile, Progression
+from lion.core.typing import ID, Any, BaseModel, JsonValue, Literal
 
-from ..generic import LogManager, Pile, Progression
-from ..types import ID, BaseModel, JsonValue
 from .action_request import ActionRequest
 from .action_response import ActionResponse
 from .assistant_response import AssistantResponse

@@ -1,10 +1,6 @@
-from typing import Any
-
-from typing_extensions import override
-
+from lion.core.typing import ID, Any, JsonValue, override
 from lion.libs.parse import to_str
 
-from ..types import ID, JsonValue
 from .message import MessageFlag, MessageRole, RoledMessage
 from .utils import format_system_content, validate_sender_recipient
 
