@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from lion import Branch
-from lion.protocols.operatives.instruct import InstructModel
+from lion.protocols.operatives.instruct import Instruct
 
 from .prompt import PROMPT
 from .utils import parse_selection, parse_to_representation
@@ -17,7 +17,7 @@ class SelectionModel(BaseModel):
 
 
 async def select(
-    instruct: InstructModel | dict[str, Any],
+    instruct: Instruct | dict[str, Any],
     choices: list[str] | type[Enum] | dict[str, Any],
     max_num_selections: int = 1,
     branch: Branch | None = None,
@@ -48,7 +48,7 @@ async def select(
     selections, contents = parse_to_representation(choices)
     prompt = PROMPT.format(max_num_selections=max_num_selections, choices=selections)
 
-    if isinstance(instruct, InstructModel):
+    if isinstance(instruct, Instruct):
         instruct = instruct.clean_dump()
 
     instruct = instruct or {}

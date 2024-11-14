@@ -3,13 +3,13 @@ from typing import Any
 from lion.core.session.branch import Branch
 from lion.core.session.session import Session
 from lion.core.typing import ID
-from lion.protocols.operatives.instruct import INSTRUCT_MODEL_FIELD, InstructModel
+from lion.protocols.operatives.instruct import INSTRUCT_MODEL_FIELD, Instruct
 
 from .prompt import PROMPT
 
 
 async def run_step(
-    ins: InstructModel,
+    ins: Instruct,
     session: Session,
     branch: Branch,
     verbose: bool = False,
@@ -39,7 +39,7 @@ async def run_step(
 
 
 async def plan(
-    instruct: InstructModel | dict[str, Any],
+    instruct: Instruct | dict[str, Any],
     num_steps: int = 3,
     session: Session | None = None,
     branch: Branch | ID.Ref | None = None,
@@ -76,7 +76,7 @@ async def plan(
     session = session or Session()
     branch = branch or session.new_branch(**(branch_kwargs or {}))
 
-    if isinstance(instruct, InstructModel):
+    if isinstance(instruct, Instruct):
         instruct = instruct.clean_dump()
     if not isinstance(instruct, dict):
         raise ValueError(
@@ -97,7 +97,7 @@ async def plan(
 
     results = res1 if isinstance(res1, list) else [res1]
     if hasattr(res1, "instruct_models"):
-        instructs: list[InstructModel] = res1.instruct_models
+        instructs: list[Instruct] = res1.instruct_models
         for i, ins in enumerate(instructs, 1):
             if verbose:
                 print(f"\nExecuting step {i}/{len(instructs)}")
