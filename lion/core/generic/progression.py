@@ -1,3 +1,5 @@
+"""Base module for progression operations."""
+
 import contextlib
 from collections.abc import Iterator
 from typing import Any, Self
@@ -5,9 +7,9 @@ from typing import Any, Self
 from pydantic import field_validator
 from typing_extensions import override
 
+from lion.core.typing import ID, Field, ItemNotFoundError, LnID, Ordering
 from lion.libs.parse import to_list
 
-from ..types import ID, Field, ItemNotFoundError, LnID, Ordering
 from .element import Element
 from .utils import to_list_type, validate_order
 
@@ -29,7 +31,13 @@ class Progression(Element, Ordering):
 
     @field_validator("order", mode="before")
     def _validate_order(cls, value: ID.RefSeq) -> list[LnID]:
-        return validate_order(value)
+        """Validate the order field."""
+        if not value:
+            return []
+        try:
+            return validate_order(value)
+        except Exception as e:
+            raise ValueError(f"Invalid order: {e}")
 
     def __contains__(self, item: ID.RefSeq | ID.Ref) -> bool:
         """Check if item(s) are in the progression."""
@@ -43,13 +51,10 @@ class Progression(Element, Ordering):
             check = False
             if isinstance(i, str):
                 check = i in self.order
-
             elif isinstance(i, Element):
                 check = i.ln_id in self.order
-
             if not check:
                 return False
-
         return check
 
     def __list__(self) -> list[LnID]:
@@ -62,7 +67,7 @@ class Progression(Element, Ordering):
 
     def __getitem__(self, key: int | slice) -> ID.IDSeq:
         """Get an item or slice of items from the progression."""
-        if not isinstance(key, int | slice):
+        if not isinstance(key, (int, slice)):
             key_cls = key.__class__.__name__
             raise TypeError(f"indices must be integers or slices, not {key_cls}")
 
@@ -80,8 +85,9 @@ class Progression(Element, Ordering):
     def __setitem__(self, key: int | slice, value: ID.RefSeq) -> None:
         """Set an item or slice of items in the progression."""
         a = validate_order(value)
-        self.order[key] = a
-        self.order = to_list(self.order, flatten=True)
+        self.order[key] = a if isinstance(key, int) else a
+        if isinstance(key, slice):
+            self.order = to_list(self.order, flatten=True)
 
     def __delitem__(self, key: int | slice) -> None:
         """Delete an item or slice of items from the progression."""
@@ -137,9 +143,13 @@ class Progression(Element, Ordering):
         """Check if the progression is empty."""
         return not self.order
 
-    def __reverse__(self) -> Iterator[LnID]:
+    def reverse(self) -> "Progression":
         """Return a reversed progression."""
-        return self.__class__(reversed(self.order), name=self.name)
+        return self.__class__(order=list(reversed(self.order)), name=self.name)
+
+    def __reverse__(self) -> "Progression":
+        """Return a reversed progression."""
+        return self.reverse()
 
     @override
     def __eq__(self, other: "Progression", /) -> bool:
@@ -178,7 +188,7 @@ class Progression(Element, Ordering):
             raise ItemNotFoundError from e
 
     def extend(self, item: "Progression", /) -> None:
-        """Extend the progression from the right with anorher progression."""
+        """Extend the progression from the right with another progression."""
         if not isinstance(item, Progression):
             raise TypeError(expected_type=Progression, actual_type=type(item))
         self.order.extend(item.order)
@@ -195,13 +205,14 @@ class Progression(Element, Ordering):
         return not self.is_empty()
 
     def __add__(self, other: ID.RefSeq) -> "Progression":
-        """returns a new progression with items added to the end"""
+        """Returns a new progression with items added to the end"""
         other = validate_order(other)
-        new_order = list(self)
+        new_order = list(self.order)  # Create a new list to avoid modifying original
         new_order.extend(other)
         return self.__class__(order=new_order)
 
     def __radd__(self, other: ID.RefSeq) -> "Progression":
+        """Reverse add operation"""
         return self + other
 
     def __iadd__(self, other: ID.RefSeq) -> Self:
@@ -250,6 +261,3 @@ def progression(
 ) -> Progression:
     """Create a new Progression instance."""
     return Progression(order=order, name=name)
-
-
-# File: autoos/generic/progression.py

@@ -1,22 +1,25 @@
-from typing import Any, ClassVar, TypeVar
+"""Component module for the Lion framework."""
 
 from pydantic import field_serializer
 from typing_extensions import override
 
 from lion.core._class_registry import get_class
-from lion.libs.utils import copy, time
-from lion.protocols.adapters.adapter import Adapter, AdapterRegistry
-from lion.protocols.registries._component_registry import ComponentAdapterRegistry
-
-from ..types import (
+from lion.core.typing import (
     UNDEFINED,
+    Any,
+    ClassVar,
     Field,
     FieldInfo,
     FieldModel,
     Note,
     OperableModel,
     PydanticUndefined,
+    TypeVar,
 )
+from lion.libs.utils import copy, time
+from lion.protocols.adapters.adapter import Adapter, AdapterRegistry
+from lion.protocols.registries._component_registry import ComponentAdapterRegistry
+
 from .element import Element
 
 FIELD_NAME = TypeVar("FIELD_NAME", bound=str)
@@ -48,8 +51,19 @@ class Component(Element, OperableModel):
     _adapter_registry: ClassVar = ComponentAdapterRegistry
 
     @field_serializer("metadata")
-    def _serialize_metadata(self, value: Note):
-        return value.to_dict()
+    def _serialize_metadata(self, value: Note) -> dict:
+        """Serialize metadata Note recursively."""
+        return self._serialize_note_recursive(value)
+
+    def _serialize_note_recursive(self, note: Note) -> dict:
+        """Recursively serialize a Note object and its nested Notes."""
+        result = {}
+        for key, value in note.items():
+            if isinstance(value, Note):
+                result[key] = self._serialize_note_recursive(value)
+            else:
+                result[key] = value
+        return result
 
     def add_field(
         self,
@@ -86,10 +100,6 @@ class Component(Element, OperableModel):
             **kwargs,
         )
 
-    # when updating field, we do not check the validity of annotation
-    # meaning current value will not get validated, and can lead to
-    # errors when storing and loading if you change annotation to a type
-    # that is not compatible with the current value
     def update_field(
         self,
         field_name: FIELD_NAME,
@@ -141,7 +151,7 @@ class Component(Element, OperableModel):
         """
         dict_ = self.model_dump(**kwargs)
         if isinstance(self.content, Note):
-            dict_["content"] = self.content.content
+            dict_["content"] = self._serialize_note_recursive(self.content)
         extra_fields = dict_.pop("extra_fields", {})
         dict_ = {**dict_, **extra_fields, "lion_class": self.class_name()}
         for i in list(dict_.keys()):
@@ -150,6 +160,7 @@ class Component(Element, OperableModel):
         return dict_
 
     def to_note(self, **kwargs: Any) -> Note:
+        """Convert the component to a Note object."""
         return Note(**self.to_dict(**kwargs))
 
     @override
@@ -319,5 +330,3 @@ class Component(Element, OperableModel):
 
 
 __all__ = ["Component"]
-
-# File: autoos/generic/component.py
