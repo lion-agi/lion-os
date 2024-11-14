@@ -91,7 +91,7 @@ class Log(Element):
     @field_serializer("content", "loginfo")
     def _serialize_note(self, value: Note) -> dict:
         """Serialize Note objects."""
-        return value.model_dump(mode="json")
+        return value.to_dict()
 
     def to_dict(self) -> dict:
         """Convert Log to dictionary."""
@@ -100,12 +100,6 @@ class Log(Element):
         dict_["log_id"] = dict_.pop("ln_id")
         dict_["log_class"] = dict_.pop("lion_class")
         dict_["log_timestamp"] = dict_.pop("timestamp")
-
-        # Handle nested Note objects
-        if isinstance(dict_.get("content"), Note):
-            dict_["content"] = dict_["content"].model_dump(mode="json")
-        if isinstance(dict_.get("loginfo"), Note):
-            dict_["loginfo"] = dict_["loginfo"].model_dump(mode="json")
 
         dict_ = to_dict(
             dict_,
