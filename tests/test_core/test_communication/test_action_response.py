@@ -2,7 +2,7 @@ import pytest
 
 from lion.core.communication import ActionRequest, ActionResponse
 from lion.core.communication.message import MessageRole
-from lion.core.types import Note
+from lion.core.typing import Note
 
 
 def test_action_response_initialization():

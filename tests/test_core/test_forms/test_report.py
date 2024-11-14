@@ -4,7 +4,7 @@ from pydantic import Field
 from lion.core.forms.form import Form
 from lion.core.forms.report import Report
 from lion.core.generic import Pile
-from lion.core.types import UNDEFINED
+from lion.core.typing import UNDEFINED
 
 
 class SimpleReport(Report):

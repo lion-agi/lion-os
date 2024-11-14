@@ -2,7 +2,7 @@ import pytest
 from pydantic import Field
 
 from lion.core.forms.form import Form
-from lion.core.types import UNDEFINED
+from lion.core.typing import UNDEFINED
 
 
 class SimpleTaskForm(Form):

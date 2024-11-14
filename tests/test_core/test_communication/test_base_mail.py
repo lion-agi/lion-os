@@ -3,7 +3,7 @@ from pydantic import ValidationError
 
 from lion.core.communication.base_mail import BaseMail
 from lion.core.generic import Element
-from lion.core.types import ID
+from lion.core.typing import ID
 
 
 class TestElement(Element):

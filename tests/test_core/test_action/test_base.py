@@ -4,7 +4,7 @@ import pytest
 
 from lion.core.action.base import EventStatus, ObservableAction
 from lion.core.generic import Log
-from lion.core.types import UNDEFINED
+from lion.core.typing import UNDEFINED
 from lion.settings import TimedFuncCallConfig
 
 

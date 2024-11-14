@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from lion.core.communication import AssistantResponse
 from lion.core.communication.message import MessageRole
-from lion.core.types import Note
+from lion.core.typing import Note
 
 
 class Message(BaseModel):

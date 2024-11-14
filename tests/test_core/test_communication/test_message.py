@@ -10,7 +10,7 @@ from lion.core.communication.message import (
     MessageRole,
     RoledMessage,
 )
-from lion.core.types import Note
+from lion.core.typing import Note
 
 
 class CustomMessage(RoledMessage):

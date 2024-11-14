@@ -13,7 +13,7 @@ from lion.core.communication.utils import (
     validate_sender_recipient,
 )
 from lion.core.generic import Element
-from lion.core.types import ID, Note
+from lion.core.typing import ID, Note
 
 
 class TestElement(Element):

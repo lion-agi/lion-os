@@ -6,7 +6,7 @@ import pytest
 from lion.core.action.base import EventStatus
 from lion.core.action.function_calling import FunctionCalling
 from lion.core.action.tool import Tool
-from lion.core.types import UNDEFINED
+from lion.core.typing import UNDEFINED
 from lion.settings import TimedFuncCallConfig
 
 

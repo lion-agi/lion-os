@@ -2,7 +2,7 @@ import pytest
 from pydantic import Field
 
 from lion.core.forms.base import BaseForm
-from lion.core.types import UNDEFINED, PydanticUndefined
+from lion.core.typing import UNDEFINED, PydanticUndefined
 
 
 class SimpleForm(BaseForm):
