@@ -27,7 +27,7 @@ from lion.libs.parse import (
     to_list,
     validate_boolean,
 )
-from lion.libs.utils import copy, unique_hash
+from lion.libs.utils import copy
 
 INDICE_TYPE = str | list[str | int]
 FIELD_NAME = TypeVar("FIELD_NAME", bound=str)
@@ -60,14 +60,13 @@ class BaseAutoModel(BaseModel):
 class SchemaModel(BaseAutoModel):
 
     model_config = ConfigDict(extra="forbid", validate_default=False, **common_config)
-    _unique_hash: str = PrivateAttr(lambda: unique_hash(32))
 
     @classmethod
     def keys(cls) -> list[str]:
         return list(cls.model_fields.keys())
 
     def __hash__(self) -> int:
-        return hash(self._unique_hash)
+        return hash(str(self.clean_dump()))
 
 
 class FieldModel(SchemaModel):
