@@ -99,7 +99,7 @@ ACTIONS_FIELD = FieldModel(
 )
 
 
-class InstructModel(SchemaModel):
+class Instruct(SchemaModel):
     """Model for defining instruction parameters and execution requirements.
 
     Attributes:
@@ -113,8 +113,6 @@ class InstructModel(SchemaModel):
     instruction: JsonValue | None = INSTRUCTION_FIELD.field_info
     guidance: JsonValue | None = GUIDANCE_FIELD.field_info
     context: JsonValue | None = CONTEXT_FIELD.field_info
-    reason: bool = REASON_FIELD.field_info
-    actions: bool = ACTIONS_FIELD.field_info
 
     @field_validator("instruction", **INSTRUCTION_FIELD.validator_kwargs)
     def _validate_instruction(cls, v):
@@ -127,6 +125,13 @@ class InstructModel(SchemaModel):
             JsonValue | None: The validated instruction value.
         """
         return INSTRUCTION_FIELD.validator(cls, v)
+
+
+class OperationInstruct(SchemaModel):
+
+    instruct: Instruct | None = None
+    reason: bool = REASON_FIELD.field_info
+    actions: bool = ACTIONS_FIELD.field_info
 
     @field_validator("reason", **REASON_FIELD.validator_kwargs)
     def _validate_reason(cls, v):
@@ -155,7 +160,7 @@ class InstructModel(SchemaModel):
 
 INSTRUCT_MODEL_FIELD = FieldModel(
     name="instruct_models",
-    annotation=list[InstructModel],
+    annotation=list[Instruct],
     default_factory=list,
     title="Instruction Model",
     description="Model for defining instruction parameters and execution requirements.",
@@ -168,6 +173,6 @@ __all__ = [
     "CONTEXT_FIELD",
     "REASON_FIELD",
     "ACTIONS_FIELD",
-    "InstructModel",
+    "Instruct",
     "INSTRUCT_MODEL_FIELD",
 ]

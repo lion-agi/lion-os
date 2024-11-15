@@ -1,20 +1,29 @@
-from typing import Any
-
 from lion.core.session.branch import Branch
 from lion.core.session.session import Session
-from lion.core.typing import ID
+from lion.core.typing import ID, Any, BaseModel
 from lion.libs.func import alcall
-from lion.protocols.operatives.instruct import INSTRUCT_MODEL_FIELD, InstructModel
+from lion.libs.parse import to_flat_list
+from lion.protocols.operatives.instruct import INSTRUCT_MODEL_FIELD, Instruct
 
 from .prompt import PROMPT
 
 
+class BrainStormInstruct(Instruct):
+    response: Any | None = None
+
+
+class BrainstormOperation(BaseModel):
+    initial: Any
+    brainstorm: list[Instruct] | None = None
+    explore: list[BrainStormInstruct] | None = None
+
+
 async def run_instruct(
-    ins: InstructModel,
+    ins: Instruct,
     session: Session,
     branch: Branch,
     auto_run: bool,
-    verbose: bool = False,
+    verbose: bool = True,
     **kwargs: Any,
 ) -> Any:
     """Execute an instruction within a brainstorming session.
@@ -30,15 +39,17 @@ async def run_instruct(
     Returns:
         The result of the instruction execution.
     """
-    if verbose:
-        guidance_preview = (
-            ins.guidance[:100] + "..." if len(ins.guidance) > 100 else ins.guidance
-        )
-        print(f"Running instruction: {guidance_preview}")
 
     async def run(ins_):
+        if verbose:
+            msg_ = (
+                ins_.guidance[:100] + "..."
+                if len(ins_.guidance) > 100
+                else ins_.guidance
+            )
+            print(f"\n-----Running instruction-----\n{msg_}")
         b_ = session.split(branch)
-        return await run_instruct(ins_, session, b_, False, **kwargs)
+        return await run_instruct(ins_, session, b_, False, verbose=verbose, **kwargs)
 
     config = {**ins.model_dump(), **kwargs}
     res = await branch.operate(**config)
@@ -63,11 +74,13 @@ async def run_instruct(
 
 
 async def brainstorm(
-    instruct: InstructModel | dict[str, Any],
+    instruct: Instruct | dict[str, Any],
     num_instruct: int = 3,
     session: Session | None = None,
     branch: Branch | ID.Ref | None = None,
     auto_run: bool = True,
+    auto_explore: bool = False,
+    explore_kwargs: dict[str, Any] | None = None,
     branch_kwargs: dict[str, Any] | None = None,
     return_session: bool = False,
     verbose: bool = False,
@@ -89,8 +102,11 @@ async def brainstorm(
     Returns:
         The results of the brainstorming session, optionally with the session.
     """
+    if auto_explore and not auto_run:
+        raise ValueError("auto_explore requires auto_run to be True.")
+
     if verbose:
-        print(f"Starting brainstorming with {num_instruct} instructions.")
+        print(f"Starting brainstorming...")
 
     field_models: list = kwargs.get("field_models", [])
     if INSTRUCT_MODEL_FIELD not in field_models:
@@ -111,8 +127,9 @@ async def brainstorm(
         if branch is None:
             branch = session.new_branch(**(branch_kwargs or {}))
 
-    if isinstance(instruct, InstructModel):
+    if isinstance(instruct, Instruct):
         instruct = instruct.clean_dump()
+
     if not isinstance(instruct, dict):
         raise ValueError(
             "instruct needs to be an InstructModel obj or a dictionary of valid parameters"
@@ -128,32 +145,72 @@ async def brainstorm(
     instructs = None
 
     async def run(ins_):
+        if verbose:
+            msg_ = (
+                ins_.guidance[:100] + "..."
+                if len(ins_.guidance) > 100
+                else ins_.guidance
+            )
+            print(f"\n-----Running instruction-----\n{msg_}")
         b_ = session.split(branch)
         return await run_instruct(
             ins_, session, b_, auto_run, verbose=verbose, **kwargs
         )
 
+    out = BrainstormOperation(initial=res1)
+
     if not auto_run:
-        return res1
+        if return_session:
+            return out, session
+        return out
 
     async with session.branches:
+        response_ = []
         if hasattr(res1, "instruct_models"):
-            instructs: list[InstructModel] = res1.instruct_models
+            instructs: list[Instruct] = res1.instruct_models
             ress = await alcall(instructs, run)
-            response_ = []
+            ress = to_flat_list(ress, dropna=True)
 
-            for res in ress:
-                if isinstance(res, list):
-                    response_.extend(res)
-                else:
-                    response_.append(res)
-
+            response_ = [
+                res if not isinstance(res, str | dict) else None for res in ress
+            ]
+            response_ = to_flat_list(response_, unique=True, dropna=True)
+            out.brainstorm = response_ if isinstance(response_, list) else [response_]
             response_.insert(0, res1)
-            if return_session:
-                return response_, session
-            return response_
+
+        if response_ and auto_explore:
+
+            async def explore(ins_: Instruct):
+                if verbose:
+                    msg_ = (
+                        ins_.guidance[:100] + "..."
+                        if len(ins_.guidance) > 100
+                        else ins_.guidance
+                    )
+                    print(f"\n-----Exploring Idea-----\n{msg_}")
+                b_ = session.split(branch)
+                response = await b_.communicate(
+                    instruction=ins_.instruction,
+                    guidance=ins_.guidance,
+                    context=ins_.context,
+                    **(explore_kwargs or {}),
+                )
+                return BrainStormInstruct(
+                    instruction=ins_.instruction,
+                    guidance=ins_.guidance,
+                    context=ins_.context,
+                    response=response,
+                )
+
+            response_ = to_flat_list(
+                [i.instruct_models for i in response_ if hasattr(i, "instruct_models")],
+                dropna=True,
+                unique=True,
+            )
+            res_explore = await alcall(response_, explore)
+            out.explore = res_explore
 
     if return_session:
-        return res1, session
+        return out, session
 
-    return res1
+    return out
