@@ -1,13 +1,14 @@
-from typing import Any, Literal
+from typing import Any, Dict, Literal, Optional
 
-from lion.core.models import Field, SchemaModel
+from pydantic import Field
 
+from .base import BaseConfig
 from .imodel_config import iModelConfig
 from .log_config import LogConfig
-from .retry_config import TimedFuncCallConfig
+from .retry_config import RetryConfig
 
 
-class MessageConfig(SchemaModel):
+class MessageConfig(BaseConfig):
     """Configuration for message handling in Branch"""
 
     validation_mode: Literal["raise", "return_value", "return_none"] = Field(
@@ -17,7 +18,6 @@ class MessageConfig(SchemaModel):
     auto_retries: bool = Field(
         False, description="Whether to automatically retry message parsing"
     )
-
     max_retries: int = Field(
         default=0, description="Maximum retries for message parsing"
     )
@@ -30,7 +30,7 @@ class MessageConfig(SchemaModel):
     )
 
 
-class BranchConfig(SchemaModel):
+class BranchConfig(BaseConfig):
     """Main configuration for Branch class.
 
     Combines all aspects of Branch configuration including logging,
@@ -55,8 +55,8 @@ class BranchConfig(SchemaModel):
         default=True,
         description="Whether to automatically register tools when needed",
     )
-    action_call_config: TimedFuncCallConfig = Field(
-        default_factory=TimedFuncCallConfig,
+    action_call_config: RetryConfig = Field(
+        default_factory=RetryConfig,
         description="Configuration for action execution",
     )
     imodel_config: iModelConfig | None = Field(
@@ -69,6 +69,31 @@ class BranchConfig(SchemaModel):
         default_factory=dict,
         description="Additional branch-specific configurations",
     )
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if self.is_production:
+            # Production environment restrictions
+            self.auto_register_tools = (
+                False  # Disable auto tool registration in production
+            )
+            self.message_config.auto_retries = False  # Disable auto retries
+            self.message_config.validation_mode = (
+                "raise"  # Strict validation in production
+            )
+
+    def validate_security(self) -> None:
+        """Validate security-critical configuration settings."""
+        super().validate_security()
+        if self.is_production:
+            if self.auto_register_tools:
+                raise ValueError(
+                    "Auto tool registration must be disabled in production"
+                )
+            if self.message_config.validation_mode != "raise":
+                raise ValueError("Message validation must be strict in production")
+            if self.message_config.auto_retries:
+                raise ValueError("Auto retries must be disabled in production")
 
 
 __all__ = [

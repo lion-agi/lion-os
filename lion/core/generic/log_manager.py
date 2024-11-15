@@ -3,8 +3,8 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from lion.core.config.log_config import LogConfig
 from lion.libs.file import create_path
-from lion.protocols.configs.log_config import LogConfig
 
 from .log import Log
 from .pile import Pile

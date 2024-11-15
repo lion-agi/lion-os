@@ -1,8 +1,13 @@
+from functools import partial
+
+from pydantic import field_serializer, model_serializer
+
+from lion.core.models import BaseAutoModel
 from lion.core.session.branch import Branch
 from lion.core.session.session import Session
 from lion.core.typing import ID, Any, BaseModel
 from lion.libs.func import alcall
-from lion.libs.parse import to_flat_list
+from lion.libs.parse import to_dict, to_flat_list
 from lion.protocols.operatives.instruct import INSTRUCT_MODEL_FIELD, Instruct
 
 from .prompt import PROMPT
@@ -12,10 +17,28 @@ class BrainStormInstruct(Instruct):
     response: Any | None = None
 
 
-class BrainstormOperation(BaseModel):
+class BrainstormOperation(BaseAutoModel):
     initial: Any
     brainstorm: list[Instruct] | None = None
     explore: list[BrainStormInstruct] | None = None
+
+    @field_serializer(
+        "brainstorm",
+        "explore",
+        "initial",
+    )
+    def _serialize(self, value):
+        if hasattr(value, "clean_dump"):
+            return value.clean_dump()
+        if hasattr(value, "model_dump"):
+            return value.model_dump()
+        if isinstance(value, list):
+            return [self._serialize(r) for r in value]
+        if isinstance(value, dict):
+            return {k: self._serialize(v) for k, v in value.items()}
+        if isinstance(value, type):  # Handle ModelMetaclass
+            return value.__name__
+        return value
 
 
 async def run_instruct(
@@ -51,7 +74,7 @@ async def run_instruct(
         b_ = session.split(branch)
         return await run_instruct(ins_, session, b_, False, verbose=verbose, **kwargs)
 
-    config = {**ins.model_dump(), **kwargs}
+    config = {**ins.clean_dump(), **kwargs}
     res = await branch.operate(**config)
     branch.msgs.logger.dump()
     instructs = []
@@ -75,7 +98,7 @@ async def run_instruct(
 
 async def brainstorm(
     instruct: Instruct | dict[str, Any],
-    num_instruct: int = 3,
+    num_instruct: int = 2,
     session: Session | None = None,
     branch: Branch | ID.Ref | None = None,
     auto_run: bool = True,
@@ -116,7 +139,15 @@ async def brainstorm(
 
     if session is not None:
         if branch is not None:
-            branch: Branch = session.branches[branch]
+            if isinstance(branch, Branch):
+                if branch not in session.branches:
+                    session.branches.include(branch)
+            else:
+                try:
+                    branch_id = ID.get_id(branch)
+                    branch = session.branches[branch_id]
+                except Exception:
+                    branch = session.new_branch(**(branch_kwargs or {}))
         else:
             branch = session.new_branch(**(branch_kwargs or {}))
     else:
@@ -195,6 +226,7 @@ async def brainstorm(
                     context=ins_.context,
                     **(explore_kwargs or {}),
                 )
+                b_.msgs.logger.dump()
                 return BrainStormInstruct(
                     instruction=ins_.instruction,
                     guidance=ins_.guidance,

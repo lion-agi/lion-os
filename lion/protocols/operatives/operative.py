@@ -11,26 +11,24 @@ class Operative(OperableModel):
     """Class representing an operative that handles request and response models for operations."""
 
     name: str | None = None
-
     request_params: NewModelParams | None = Field(default=None)
-    request_type: type[BaseModel] | None = Field(default=None)
-
     response_params: NewModelParams | None = Field(default=None)
-    response_type: type[BaseModel] | None = Field(default=None)
     response_model: OperableModel | None = Field(default=None)
     response_str_dict: dict | str | None = Field(default=None)
-
     auto_retry_parse: bool = True
     max_retries: int = 3
+
+    _request_type: type[BaseModel] | None = PrivateAttr(default=None)
+    _response_type: type[BaseModel] | None = PrivateAttr(default=None)
     _should_retry: bool = PrivateAttr(default=None)
 
     @model_validator(mode="after")
     def _validate(self) -> Self:
         """Validates the operative instance after initialization."""
-        if self.request_type is None:
-            self.request_type = self.request_params.create_new_model()
+        if self._request_type is None:
+            self._request_type = self.request_params.create_new_model()
         if self.name is None:
-            self.name = self.request_params.name or self.request_type.__name__
+            self.name = self.request_params.name or self._request_type.__name__
         return self
 
     def raise_validate_pydantic(self, text: str) -> None:
@@ -47,10 +45,10 @@ class Operative(OperableModel):
             d_ = d_[0]
         try:
             d_ = validate_keys(
-                d_, self.request_type.model_fields, handle_unmatched="raise"
+                d_, self._request_type.model_fields, handle_unmatched="raise"
             )
             d_ = {k: v for k, v in d_.items() if v != UNDEFINED}
-            self.response_model = self.request_type.model_validate(d_)
+            self.response_model = self._request_type.model_validate(d_)
             self._should_retry = False
         except Exception:
             self.response_str_dict = d_
@@ -68,10 +66,10 @@ class Operative(OperableModel):
             if isinstance(d_, list | tuple) and len(d_) == 1:
                 d_ = d_[0]
             d_ = validate_keys(
-                d_, self.request_type.model_fields, handle_unmatched="force"
+                d_, self._request_type.model_fields, handle_unmatched="force"
             )
             d_ = {k: v for k, v in d_.items() if v != UNDEFINED}
-            self.response_model = self.request_type.model_validate(d_)
+            self.response_model = self._request_type.model_validate(d_)
             self._should_retry = False
         except Exception:
             self.response_str_dict = d_
@@ -103,15 +101,15 @@ class Operative(OperableModel):
             except Exception:
                 self.force_validate_pydantic(text)
 
-        if data and self.response_type:
+        if data and self._response_type:
             d_ = self.response_model.model_dump()
             d_.update(data)
-            self.response_model = self.response_type.model_validate(d_)
+            self.response_model = self._response_type.model_validate(d_)
 
         if not self.response_model and isinstance(self.response_str_dict, list):
             try:
                 self.response_model = [
-                    self.request_type.model_validate(d_)
+                    self._request_type.model_validate(d_)
                     for d_ in self.response_str_dict
                 ]
             except Exception:
@@ -163,4 +161,4 @@ class Operative(OperableModel):
         if validators and isinstance(validators, dict):
             self.response_params._validators.update(validators)
 
-        self.response_type = self.response_params.create_new_model()
+        self._response_type = self.response_params.create_new_model()

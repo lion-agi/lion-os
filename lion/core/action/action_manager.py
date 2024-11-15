@@ -28,6 +28,42 @@ class ActionManager:
         self.registry: dict[str, Tool] = registry or {}
         self.logger = logger or LogManager()
 
+    def model_dump(self) -> dict:
+        """Serialize the ActionManager to a dictionary."""
+        return {
+            "registry": {
+                name: tool.model_dump() for name, tool in self.registry.items()
+            },
+            "logger_config": (
+                {
+                    "persist_dir": self.logger.persist_dir,
+                    "subfolder": self.logger.subfolder,
+                    "file_prefix": self.logger.file_prefix,
+                    "capacity": self.logger.capacity,
+                    "extension": self.logger.extension,
+                    "use_timestamp": self.logger.use_timestamp,
+                    "hash_digits": self.logger.hash_digits,
+                    "clear_after_dump": self.logger.clear_after_dump,
+                }
+                if self.logger
+                else None
+            ),
+        }
+
+    @classmethod
+    def model_validate(cls, data: dict) -> "ActionManager":
+        """Create an ActionManager instance from serialized data."""
+        registry = {}
+        if data.get("registry"):
+            for name, tool_data in data["registry"].items():
+                registry[name] = Tool.model_validate(tool_data)
+
+        logger = None
+        if data.get("logger_config"):
+            logger = LogManager(**data["logger_config"])
+
+        return cls(registry=registry, logger=logger)
+
     def __contains__(self, tool: FINDABLE_TOOL) -> bool:
         """Check if a tool is registered in the registry.
 
@@ -256,4 +292,3 @@ class ActionManager:
 
 
 __all__ = ["ActionManager"]
-# File: autoos/action/tool_manager.py

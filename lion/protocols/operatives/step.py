@@ -139,7 +139,7 @@ class Step:
 
         data = operative.response_model.model_dump()
         data.update(additional_data or {})
-        operative.response_model = operative.response_type.model_validate(data)
+        operative.response_model = operative._response_type.model_validate(data)
         return operative
 
     @staticmethod
@@ -172,7 +172,7 @@ class Step:
         field_models = field_models or []
 
         if (
-            hasattr(operative.request_type, "action_required")
+            hasattr(operative._request_type, "action_required")
             and operative.response_model.action_required
         ):
             field_models.extend(
@@ -182,7 +182,7 @@ class Step:
                     ACTION_REQUESTS_FIELD,
                 ]
             )
-        if hasattr(operative.request_type, "reason"):
+        if hasattr(operative._request_type, "reason"):
             field_models.extend([REASON_FIELD])
 
         exclude_fields = exclude_fields or []

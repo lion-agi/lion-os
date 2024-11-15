@@ -148,7 +148,7 @@ class BranchOperationMixin(ABC):
             context=context,
             sender=sender,
             recipient=recipient,
-            request_model=operative.request_type,
+            request_model=operative._request_type,
             progress=progress,
             imodel=imodel,
             images=images,
@@ -179,7 +179,7 @@ class BranchOperationMixin(ABC):
                     instruction="reformat text into specified model",
                     guidance="follow the required response format, using the model schema as a guide",
                     context=[{"text_to_format": res.response}],
-                    request_model=operative.request_type,
+                    request_model=operative._request_type,
                     sender=self.user,
                     recipient=self,
                 )

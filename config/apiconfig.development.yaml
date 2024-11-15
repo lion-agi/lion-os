@@ -1,0 +1,14 @@
+api_keys:
+  - dev-key-12345678901234567890123456789012
+min_key_length: 32
+key_pattern: ^[a-zA-Z0-9-_]{32,}$
+rate_limit_enabled: true
+rate_limit_requests: 100
+rate_limit_window: 60
+allow_dev_keys: true
+require_https: false
+cors_origins:
+  - "*"
+request_timeout: 30
+long_polling_timeout: 300
+environment: development

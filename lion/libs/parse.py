@@ -1228,7 +1228,7 @@ def _generic_type_to_dict(
 ) -> dict[str, Any]:
 
     try:
-        for method in ["to_dict", "dict", "json", "to_json"]:
+        for method in ["clean_dump", "to_dict", "dict", "json", "to_json"]:
             if hasattr(input_, method):
                 result = getattr(input_, method)(**kwargs)
                 return json.loads(result) if isinstance(result, str) else result

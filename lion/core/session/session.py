@@ -15,13 +15,11 @@ from .branch import Branch
 
 class Session(Component):
     """
-    Manages multiple conversation branches and mail transfer in a session.
+    Manages multiple conversation branches in a session.
 
     Attributes:
         branches (Pile | None): Collection of conversation branches.
         default_branch (Branch | None): The default conversation branch.
-        mail_transfer (Exchange | None): Mail transfer system.
-        mail_manager (MailManager | None): Manages mail operations.
     """
 
     branches: Pile = Field(default_factory=Pile)
@@ -41,7 +39,7 @@ class Session(Component):
         tools: Tool | Callable | list = None,
         **kwargs,  # additional branch parameters
     ) -> Branch:
-
+        """Create a new branch with the given parameters."""
         kwargs["system"] = system
         kwargs["system_sender"] = system_sender
         kwargs["system_datetime"] = system_datetime
@@ -55,10 +53,11 @@ class Session(Component):
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         branch = Branch(**kwargs)
-
         self.branches.include(branch)
+
         if self.default_branch is None:
             self.default_branch = branch
+
         return branch
 
     def remove_branch(
@@ -66,13 +65,14 @@ class Session(Component):
         branch: ID.Ref,
         delete: bool = False,
     ):
+        """Remove a branch from the session."""
         branch = ID.get_id(branch)
 
         if branch not in self.branches:
             _s = str(branch) if len(str(branch)) < 10 else str(branch)[:10] + "..."
             raise ItemNotFoundError(f"Branch {_s}.. does not exist.")
-        branch: Branch = self.branches[branch]
 
+        branch: Branch = self.branches[branch]
         self.branches.exclude(branch)
 
         if self.default_branch.ln_id == branch.ln_id:
@@ -86,7 +86,7 @@ class Session(Component):
 
     async def asplit(self, branch: ID.Ref) -> Branch:
         """
-        Split a branch, creating a new branch with the same messages and tools.
+        Split a branch asynchronously, creating a new branch with the same messages and tools.
 
         Args:
             branch: The branch to split or its identifier.
@@ -125,10 +125,12 @@ class Session(Component):
         raise ValueError("Session can only have one default branch.")
 
     def to_df(self, branches: ID.RefSeq = None) -> pd.DataFrame:
+        """Convert session messages to a DataFrame."""
         out = self.concat_messages(branches=branches)
         return out.to_df(columns=MESSAGE_FIELDS)
 
     def concat_messages(self, branches: ID.RefSeq = None) -> Pile[RoledMessage]:
+        """Concatenate messages from specified branches."""
         if not branches:
             branches = self.branches
         if isinstance(branches, dict):
@@ -148,6 +150,12 @@ class Session(Component):
 
         return out
 
-
-__all__ = ["Session"]
-# File: autoos/session/session.py
+    def to_dict(self) -> dict:
+        """Convert session to a dictionary of metadata."""
+        return {
+            "session_id": self.ln_id,
+            "branches": [b.ln_id for b in self.branches],
+            "default_branch_id": (
+                self.default_branch.ln_id if self.default_branch else None
+            ),
+        }
