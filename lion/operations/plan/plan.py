@@ -12,7 +12,7 @@ async def run_step(
     ins: Instruct,
     session: Session,
     branch: Branch,
-    verbose: bool = False,
+    verbose: bool = True,
     **kwargs: Any,
 ) -> Any:
     """Execute a single step of the plan.
@@ -46,7 +46,7 @@ async def plan(
     auto_run: bool = True,
     branch_kwargs: dict[str, Any] | None = None,
     return_session: bool = False,
-    verbose: bool = False,
+    verbose: bool = True,
     **kwargs: Any,
 ) -> Any:
     """Create and execute a multi-step plan.

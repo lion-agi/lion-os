@@ -83,7 +83,7 @@ async def brainstorm(
     explore_kwargs: dict[str, Any] | None = None,
     branch_kwargs: dict[str, Any] | None = None,
     return_session: bool = False,
-    verbose: bool = False,
+    verbose: bool = True,
     **kwargs: Any,
 ) -> Any:
     """Perform a brainstorming session.
